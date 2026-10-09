@@ -1,4 +1,6 @@
 # Dependencies
+# Exclude root-level node_modules (for workspace) but allow dsh-cleaner/node_modules
+# Use explicit file listing instead of a blanket rule
 node_modules/
 
 # Build output
@@ -28,3 +30,8 @@ workspace.json.bak-*
 # Temp files
 *.tmp
 .cache/
+
+# Root workspace files (not dsh-cleaner)
+laser-homework/
+_dsh-cleanup-backup/
+
