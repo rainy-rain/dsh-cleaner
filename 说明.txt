@@ -1,0 +1,19 @@
+# DSH 清理工具 - 精简版
+
+## 📁 文件说明
+
+- `index.js` - 核心代码（Electron 主进程）
+- `main.html` - 界面文件（HTML/CSS/JavaScript）
+- `package.json` - 项目配置
+- `启动工具.bat` - 启动脚本
+- `.gitignore` - Git 配置
+
+## 🚀 使用方法
+
+双击 `启动工具.bat` 启动应用
+
+## 📦 启动命令
+
+```bash
+npm start
+```
