@@ -189,6 +189,55 @@ ipcMain.handle('delete-sessions', async (event, idsToDelete) => {
   return { deleted, errors, backupPath };
 });
 
+// ---------- workspace.json 读写helper ----------
+const wsFilePath = () => path.join(os.homedir(), '.dsh', 'storages', 'workspace.json');
+
+function readWorkspace() {
+  return JSON.parse(fs.readFileSync(wsFilePath(), 'utf8'));
+}
+
+function writeWorkspace(json) {
+  fs.writeFileSync(wsFilePath(), JSON.stringify(json, null, 2) + '\n', 'utf8');
+}
+
+function makeBackup() {
+  const wsFile = wsFilePath();
+  const backupPath = path.join(path.dirname(wsFile), `workspace.json.bak-${Date.now()}`);
+  fs.copyFileSync(wsFile, backupPath);
+  return backupPath;
+}
+
+// IPC: 切换归档状态
+ipcMain.handle('toggle-archive', async (event, id) => {
+  const json = readWorkspace();
+  json.global = json.global || {};
+  const list = json.global.archivedSessionIds || [];
+  const idx = list.indexOf(id);
+  if (idx >= 0) list.splice(idx, 1);
+  else list.push(id);
+  json.global.archivedSessionIds = list;
+  writeWorkspace(json);
+  return { archived: idx < 0 };
+});
+
+// IPC: 切换置顶状态
+ipcMain.handle('toggle-pin', async (event, id) => {
+  const json = readWorkspace();
+  json.global = json.global || {};
+  const list = json.global.pinnedSessionIds || [];
+  const idx = list.indexOf(id);
+  if (idx >= 0) list.splice(idx, 1);
+  else list.unshift(id);
+  json.global.pinnedSessionIds = list;
+  writeWorkspace(json);
+  return { pinned: idx < 0 };
+});
+
+// IPC: 手动备份当前状态
+ipcMain.handle('backup-current', async () => {
+  return { backupPath: makeBackup() };
+});
+
 // IPC: 获取备份列表
 ipcMain.handle('get-backups', async () => {
   const home = path.join(os.homedir(), '.dsh', 'storages');

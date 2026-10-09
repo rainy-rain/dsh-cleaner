@@ -406,8 +406,20 @@
         return;
       }
 
-      list.innerHTML = sessions.map(session => `
-        <div class="session-item ${!showArchived && session.isArchived ? 'archived' : ''} ${session.isPinned ? 'pinned' : ''}">
+      // showArchived=false 时真正隐藏已归档会话（而不是仅变暗）
+      const visible = sessions.filter(s => showArchived || !s.isArchived);
+
+      if (visible.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <p>没有可显示的会话（已归档的已隐藏）</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = visible.map(session => `
+        <div class="session-item ${session.isArchived ? 'archived' : ''} ${session.isPinned ? 'pinned' : ''}">
           <input type="checkbox" class="checkbox" ${session.checked ? 'checked' : ''} data-id="${session.id}">
           <div class="session-info">
             <div class="session-title">
